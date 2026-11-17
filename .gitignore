@@ -1,0 +1,15 @@
+# OS & Editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build / Package artifacts
+*.zip
+*.crx
+*.pem
+node_modules/
+dist/

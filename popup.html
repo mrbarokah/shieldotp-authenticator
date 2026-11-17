@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShieldOTP</title>
+  <style>
+:root {
+  --google-blue: #4285F4;
+  --google-blue-hover: #1A73E8;
+  --google-red: #EA4335;
+  --google-red-hover: #D93025;
+  --google-yellow: #FBBC05;
+  --google-green: #34A853;
+}
+
+html[data-theme="dark"] {
+  --bg-shell: #131314;
+  --bg-card: #1E1F20;
+  --bg-card-hover: #282A2C;
+  --bg-input: #171819;
+  --border-subtle: #333537;
+  --text-primary: #E3E3E3;
+  --text-secondary: #9AA0A6;
+  --otp-color: #8AB4F8;
+  --ring-track: #333537;
+  --switch-off: #3C4043;
+}
+
+html[data-theme="light"] {
+  --bg-shell: #F8FAFD;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F0F4F9;
+  --bg-input: #FFFFFF;
+  --border-subtle: #DBE2EE;
+  --text-primary: #1F1F1F;
+  --text-secondary: #5F6368;
+  --otp-color: #1A73E8;
+  --ring-track: #E1E6EF;
+  --switch-off: #CBD2DC;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 340px;
+  min-height: 104px;
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-shell);
+  color: var(--text-primary);
+}
+
+body::-webkit-scrollbar,
+.accounts-list::-webkit-scrollbar {
+  width: 5px;
+}
+body::-webkit-scrollbar-thumb,
+.accounts-list::-webkit-scrollbar-thumb {
+  background: rgba(154, 160, 166, 0.35);
+  border-radius: 9999px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.shell-container {
+  background-color: var(--bg-shell);
+  width: 100%;
+}
+
+/* Clean Top Bar: No Divider Line, No Logo */
+.top-bar {
+  padding: 12px 14px 4px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+}
+
+.brand-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.1px;
+}
+
+.action-group {
+  display: flex;
+  align-items: center;
+}
+
+.icon-btn {
+  padding: 6px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
+}
+.icon-btn:hover {
+  background-color: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.icon-sm { width: 14px; height: 14px; }
+.icon-md { width: 16px; height: 16px; }
+.icon-tile { width: 18px; height: 18px; }
+
+/* Views */
+.view-card {
+  padding: 8px 14px 14px 14px;
+}
+
+.card-subheader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.title-with-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.info-icon-btn {
+  width: 17px;
+  height: 17px;
+  border-radius: 9999px;
+  border: 1px solid var(--google-blue);
+  background: rgba(66, 133, 244, 0.14);
+  color: var(--google-blue);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: serif;
+  font-style: italic;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.15s, color 0.15s;
+}
+.info-icon-btn:hover {
+  background: var(--google-blue);
+  color: #FFFFFF;
+}
+
+.info-box {
+  background-color: rgba(66, 133, 244, 0.1);
+  border: 1px solid rgba(66, 133, 244, 0.35);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.btn-back {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: 9px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-back:hover {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  border-color: var(--google-blue);
+}
+
+/* OTP List & Cards */
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 440px;
+  overflow-y: auto;
+}
+
+.otp-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.otp-card:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--google-blue);
+}
+
+.otp-card-left {
+  min-width: 0;
+  flex: 1;
+}
+
+.otp-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.otp-issuer {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.otp-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.otp-code-text {
+  margin-top: 3px;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Consolas', 'Courier New', monospace;
+  letter-spacing: 1.5px;
+  color: var(--otp-color);
+  display: inline-block;
+}
+
+.otp-card-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ring-box {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-svg { width: 32px; height: 32px; }
+.progress-ring-circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.ring-text {
+  position: absolute;
+  font-size: 10px;
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Frameless Remove (✕) Button */
+.btn-delete-card {
+  padding: 4px 6px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.1s ease;
+}
+.btn-delete-card:hover {
+  background: transparent !important;
+  color: var(--google-red);
+  transform: scale(1.12);
+}
+
+/* Empty State */
+.empty-state {
+  padding: 24px 10px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+.empty-line-1 {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.empty-line-2 {
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+/* Settings Tile Layout: 1 Long Add QR Tile + 4 Square Tiles */
+.settings-tile-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tile-long-primary {
+  width: 100%;
+  background-color: var(--google-blue);
+  border: 1px solid var(--google-blue);
+  border-radius: 12px;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #FFFFFF;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+}
+.tile-long-primary:hover {
+  background-color: var(--google-blue-hover);
+}
+.tile-long-primary .chevron {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+}
+
+.tile-long-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.tile-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.tile-square {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 11px 4px 9px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.tile-square:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--google-blue);
+  color: var(--google-blue);
+}
+
+.tile-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: color 0.15s;
+}
+.tile-square:hover .tile-label {
+  color: var(--google-blue);
+}
+
+/* Security Lock Option Cards with Right-Corner Toggle Switch */
+.lock-option-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s, opacity 0.15s;
+}
+.lock-option-card.active-lock {
+  border-color: rgba(66, 133, 244, 0.65);
+}
+.lock-option-card.disabled-lock {
+  opacity: 0.55;
+}
+
+.lock-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lock-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.lock-card-desc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Toggle Switch Widget */
+.switch-label {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  background-color: var(--switch-off);
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+.switch-slider::before {
+  content: "";
+  position: absolute;
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.switch-input:checked + .switch-slider {
+  background-color: var(--google-blue);
+}
+
+.switch-input:checked + .switch-slider::before {
+  transform: translateX(16px);
+}
+
+.switch-input:disabled + .switch-slider {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Pencil Button & Eye Masking Button */
+.pencil-btn {
+  padding: 5px;
+  border-radius: 8px;
+  background-color: rgba(66, 133, 244, 0.12);
+  border: 1px solid rgba(66, 133, 244, 0.3);
+  color: var(--google-blue);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
+}
+.pencil-btn:hover {
+  background-color: var(--google-blue);
+  color: #FFFFFF;
+}
+
+.pin-editor-box {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pin-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pr-8 {
+  padding-right: 28px !important;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.eye-btn:hover {
+  color: var(--google-blue);
+}
+
+/* Forms & Inputs */
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.qr-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px dashed var(--google-blue);
+  background-color: rgba(66, 133, 244, 0.08);
+  border-radius: 12px;
+  padding: 13px 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+.qr-dropzone:hover,
+.qr-dropzone.drag-active {
+  background-color: rgba(66, 133, 244, 0.15);
+}
+
+.qr-dropzone-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--google-blue);
+}
+
+.qr-dropzone-sub {
+  font-size: 10.5px;
+  margin-top: 4px;
+  color: var(--text-secondary);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--text-secondary);
+}
+
+.theme-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 7px 10px;
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.theme-input:focus {
+  border-color: var(--google-blue);
+}
+
+.advanced-wrapper {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 6px;
+}
+
+.advanced-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: color 0.15s;
+}
+.advanced-toggle:hover {
+  color: var(--google-blue);
+}
+
+.chevron-icon {
+  transition: transform 0.2s ease;
+}
+.chevron-icon.open {
+  transform: rotate(180deg);
+}
+
+.w-full { width: 100%; }
+.flex-1 { flex: 1; }
+.flex-row { display: flex; align-items: center; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.gap-1\.5 { gap: 6px; }
+.gap-2 { gap: 8px; }
+.mb-2 { margin-bottom: 8px; }
+.mt-2 { margin-top: 8px; }
+.font-mono { font-family: 'Consolas', monospace; }
+.text-center { text-align: center; }
+
+.section-title { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+.helper-text { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
+.error-text { font-size: 11px; color: var(--google-red); }
+
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.btn-primary {
+  background-color: var(--google-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.btn-primary:hover {
+  background-color: var(--google-blue-hover);
+}
+
+.btn-secondary {
+  background-color: rgba(66, 133, 244, 0.12);
+  color: var(--google-blue);
+  border: 1px solid rgba(66, 133, 244, 0.35);
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.btn-secondary:hover {
+  background-color: rgba(66, 133, 244, 0.22);
+}
+
+.toast-banner {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background-color: var(--google-blue);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Instant Open Skeleton Card */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
+}
+.skeleton-card {
+  pointer-events: none;
+  animation: pulseGlow 1.1s ease-in-out infinite;
+}
+.skeleton-line {
+  background-color: var(--border-subtle);
+  border-radius: 6px;
+}
+.skeleton-sm {
+  width: 110px;
+  height: 11px;
+  margin-bottom: 7px;
+}
+.skeleton-lg {
+  width: 135px;
+  height: 20px;
+}
+.skeleton-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 2.5px solid var(--border-subtle);
+}
+
+.action-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.adaptive-search-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.adaptive-search-input {
+  width: 145px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 4px 10px;
+  color: var(--text-primary);
+  font-size: 11.5px;
+  outline: none;
+  transition: border-color 0.15s, width 0.15s;
+}
+.adaptive-search-input:focus {
+  border-color: var(--google-blue);
+  width: 165px;
+}
+
+textarea.theme-input {
+  resize: none;
+  max-width: 100%;
+  width: 100%;
+  word-break: break-all;
+}
+
+.btn-icon-secondary {
+  background-color: rgba(66, 133, 244, 0.12);
+  color: var(--google-blue);
+  border: 1px solid rgba(66, 133, 244, 0.35);
+  border-radius: 10px;
+  padding: 7px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s, transform 0.1s;
+}
+.btn-icon-secondary:hover {
+  background-color: rgba(66, 133, 244, 0.22);
+}
+
+</style>
+</head>
+<body>
+  <div class="shell-container">
+
+    <!-- Clean Top Bar: Title + Adaptive Search Bar & Search Icon + Gear Settings Button -->
+    <div class="top-bar">
+      <div id="brandGroup" class="brand-group">
+        <span id="headerTitle" class="brand-title">Authenticator</span>
+      </div>
+
+      <div class="action-group">
+        <!-- Adaptive Inline Search Bar (Expands smoothly on the left of Search/Gear icons) -->
+        <div id="searchBarWrapper" class="adaptive-search-wrap hidden">
+          <input id="searchAccountsInput" type="text" placeholder="Search..." class="adaptive-search-input" />
+        </div>
+
+        <button id="btnToggleSearch" type="button" title="Search Accounts" class="icon-btn">
+          <svg class="icon-md" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+
+        <button id="btnToggleMenu" type="button" title="Settings" class="icon-btn">
+          <svg class="icon-md" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 1: Locked Vault Screen -->
+    <div id="lockedView" class="hidden view-card text-center">
+      <p class="section-title">Vault Locked</p>
+
+      <!-- Manual PIN Unlock -->
+      <div id="unlockPinSection" class="flex-row gap-2 mb-2">
+        <div class="pin-input-wrap flex-1">
+          <input id="unlockPinInput" type="password" placeholder="Enter Manual PIN..." class="theme-input w-full pr-8" />
+          <button id="btnToggleUnlockPinEye" type="button" class="eye-btn" title="Show/Hide PIN">
+            <svg class="icon-sm" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+        </div>
+        <button id="btnUnlockVault" type="button" class="btn-primary">Unlock</button>
+      </div>
+
+      <!-- PC Local Passkey Unlock -->
+      <div id="unlockPasskeySection" class="hidden">
+        <button id="btnUnlockWithPasskey" type="button" class="btn-primary w-full flex-center gap-2">
+          <svg class="icon-md" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+          </svg>
+          <span>Unlock with PC Passkey</span>
+        </button>
+      </div>
+
+      <p id="unlockErrorMsg" class="hidden error-text mt-2"></p>
+    </div>
+
+    <!-- VIEW 2: Main OTP View -->
+    <div id="otpView" class="view-card">
+      <div id="accountsContainer" class="accounts-list"></div>
+
+      <div id="emptyState" class="hidden empty-state">
+        <p class="empty-line-1">No accounts yet.</p>
+        <p class="empty-line-2">Click the <b>Gear (⚙)</b> button &gt; <b>Add QR / Key</b>.</p>
+      </div>
+    </div>
+
+    <!-- VIEW 3: Settings Card (1 Long Add QR Tile + 4 Compact Tiles Below) -->
+    <div id="settingsView" class="hidden view-card">
+      <div class="card-subheader">
+        <span class="card-subtitle">Settings</span>
+        <button id="btnCloseSettings" type="button" class="btn-back">← Back</button>
+      </div>
+
+      <div class="settings-tile-layout">
+        <!-- Long Tile: Add QR / Key -->
+        <button id="btnOpenAddModal" type="button" class="tile-long-primary">
+          <div class="tile-long-left">
+            <svg class="icon-md" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add QR / Key</span>
+          </div>
+          <span class="chevron">›</span>
+        </button>
+
+        <!-- 3 Equal Tiles Below: [Theme] [PIN] [Backup] -->
+        <div class="tile-grid-3">
+          <button id="btnToggleTheme" type="button" class="tile-square" title="Switch Dark / Light Theme">
+            <svg id="iconThemeSun" class="icon-tile hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <svg id="iconThemeMoon" class="icon-tile" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+            <span id="themeTileLabel" class="tile-label">Theme</span>
+          </button>
+
+          <button id="btnOpenPinModal" type="button" class="tile-square" title="PIN &amp; Passkey Lock">
+            <svg class="icon-tile" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span class="tile-label">PIN</span>
+          </button>
+
+          <button id="btnOpenBackupModal" type="button" class="tile-square" title="Encrypted Backup">
+            <svg class="icon-tile" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span class="tile-label">Backup</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: Add QR / Key Card -->
+    <div id="addAccountView" class="hidden view-card">
+      <div class="card-subheader">
+        <span class="card-subtitle">Add Authenticator QR or Key</span>
+        <button id="btnCloseAddModal" type="button" class="btn-back">← Back</button>
+      </div>
+
+      <div class="form-stack">
+        <label for="qrFileInput" id="qrDropzone" class="qr-dropzone" tabindex="0">
+          <div class="qr-dropzone-title">
+            <svg class="icon-md" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Upload QR Image, Drop File, or Paste (Ctrl+V)</span>
+          </div>
+          <span id="qrDecodeStatus" class="qr-dropzone-sub hidden"></span>
+          <input id="qrFileInput" type="file" accept="image/*" class="hidden" />
+        </label>
+
+        <div class="grid-2">
+          <div>
+            <label for="inputIssuer" class="field-label">Service</label>
+            <input id="inputIssuer" type="text" placeholder="" class="theme-input w-full" />
+          </div>
+          <div>
+            <label for="inputLabel" class="field-label">Account</label>
+            <input id="inputLabel" type="text" placeholder="" class="theme-input w-full" />
+          </div>
+        </div>
+
+        <div>
+          <label for="inputSecretOrUri" class="field-label">Base32 Secret or otpauth:// URI</label>
+          <div class="flex-row gap-1.5">
+            <input id="inputSecretOrUri" type="password" placeholder="JBSWY3DPEHPK3PXP or otpauth://..." class="theme-input flex-1 font-mono" />
+            <button id="btnToggleSecretVis" type="button" class="btn-secondary">Show</button>
+          </div>
+        </div>
+
+        <div class="advanced-wrapper">
+          <button id="btnToggleAdvanced" type="button" class="advanced-toggle">
+            <span>Advanced</span>
+            <svg id="advancedChevron" class="icon-sm chevron-icon" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <div id="advancedFields" class="hidden grid-2 mt-2">
+            <div>
+              <label for="selectAlgorithm" class="field-label">Algorithm</label>
+              <select id="selectAlgorithm" class="theme-input w-full">
+                <option value="SHA-1" selected>SHA-1</option>
+                <option value="SHA-256">SHA-256</option>
+                <option value="SHA-512">SHA-512</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectDigits" class="field-label">Digits</label>
+              <select id="selectDigits" class="theme-input w-full">
+                <option value="6" selected>6 Digits</option>
+                <option value="8">8 Digits</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <p id="addModalError" class="hidden error-text"></p>
+
+        <div class="panel-actions">
+          <button id="btnCancelAddModal" type="button" class="btn-secondary">Cancel</button>
+          <button id="btnSaveAccount" type="button" class="btn-primary">Encrypt &amp; Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: Combined Master PIN & PC Passkey Card with Toggle Switches -->
+    <div id="pinView" class="hidden view-card">
+      <div class="card-subheader">
+        <div class="title-with-info">
+          <span class="card-subtitle">Security Lock</span>
+          <button id="btnTogglePinInfo" type="button" class="info-icon-btn" title="Encryption Details">i</button>
+        </div>
+        <button id="btnClosePinModal" type="button" class="btn-back">← Back</button>
+      </div>
+
+      <div class="form-stack">
+        <div id="pinInfoPopover" class="hidden info-box">
+          Protects your vault using AES-256-GCM encryption and PBKDF2-HMAC-SHA256 key derivation, or via your device's built-in hardware Passkey (Windows Hello / Touch ID). Only one lock method can be active at a time.
+        </div>
+
+        <!-- Card 1: Windows Hello / PC Passkey with Switch on Top-Right -->
+        <div id="cardPasskeyLock" class="lock-option-card">
+          <div class="lock-card-header">
+            <span class="lock-card-title">Windows Hello / PC Passkey</span>
+            <label class="switch-label" title="Toggle PC Passkey">
+              <input type="checkbox" id="switchPasskey" class="switch-input" />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+          <p class="helper-text">
+            Unlock your authenticator vault using your PC's local biometric sensor, Windows Hello PIN, or Touch ID.
+          </p>
+        </div>
+
+        <!-- Card 2: Manual PIN with Switch on Top-Right & Pencil Edit Icon -->
+        <div id="cardManualPinLock" class="lock-option-card">
+          <div class="lock-card-header">
+            <span class="lock-card-title">Manual PIN</span>
+            <label class="switch-label" title="Toggle Manual PIN">
+              <input type="checkbox" id="switchManualPin" class="switch-input" />
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="lock-card-desc-row">
+            <p class="helper-text flex-1">
+              Require a custom secret PIN code to decrypt and unlock your vault.
+            </p>
+            <button id="btnEditManualPin" type="button" class="pencil-btn hidden" title="Change Manual PIN">
+              <svg class="icon-sm" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Inline PIN Entry / Edit Box (Masked Input + Eye Icon + Save) -->
+          <div id="manualPinEditor" class="hidden pin-editor-box">
+            <div class="pin-input-wrap flex-1">
+              <input id="newPinInput" type="password" placeholder="Enter Manual PIN..." class="theme-input w-full pr-8" />
+              <button id="btnToggleNewPinEye" type="button" class="eye-btn" title="Show/Hide PIN">
+                <svg id="eyeIconOpen" class="icon-sm" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg id="eyeIconClosed" class="icon-sm hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              </button>
+            </div>
+            <button id="btnSaveManualPin" type="button" class="btn-primary">Save</button>
+            <button id="btnCancelManualPinEdit" type="button" class="btn-secondary">Cancel</button>
+          </div>
+        </div>
+
+        <p id="lockSectionError" class="hidden error-text"></p>
+
+        <div id="lockNowRow" class="hidden panel-actions">
+          <button id="btnLockVaultNow" type="button" class="btn-primary w-full">Lock Vault Now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 6: Encrypted Backup Card -->
+    <div id="backupView" class="hidden view-card">
+      <div class="card-subheader">
+        <span class="card-subtitle">Encrypted Vault Backup</span>
+        <button id="btnCloseBackupModal" type="button" class="btn-back">← Back</button>
+      </div>
+      <div class="form-stack">
+        <textarea id="backupJsonArea" rows="4" class="theme-input w-full font-mono"></textarea>
+        <div class="panel-actions">
+          <button id="btnCopyBackupJson" type="button" class="btn-icon-secondary" title="Copy Encrypted JSON">
+            <svg class="icon-md" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+            </svg>
+          </button>
+          <button id="btnRestoreBackupJson" type="button" class="btn-primary">Import Backup</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toastBanner" class="hidden toast-banner">Copied!</div>
+  <script src="popup.js"></script>
+</body>
+</html>
